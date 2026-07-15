@@ -4,10 +4,11 @@ import java.time.LocalDateTime;
 import java.util.UUID;
 
 /**
- * Published when an order passes fulfilment checks.
+ * Published when an order cannot be fulfilled.
  */
-public record OrderFulfilledEvent(
+public record OrderRejectedEvent(
         UUID orderId,
+        String reason,
         LocalDateTime processedAt
 ) {
 }
