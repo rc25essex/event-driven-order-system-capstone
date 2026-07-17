@@ -63,13 +63,48 @@ docker compose up -d
 
 ## Testing
 
-The project includes unit tests for:
+### Unit Tests
+
+Run the JUnit 5 and Mockito test suite:
+
+```bash
+./gradlew test
+```
+
+or on Windows:
+
+```cmd
+gradlew.bat test
+```
+
+These tests verify:
 
 - Domain model
-- Services
-- REST controller
-- Kafka publishers
+- Service layer
+- REST controllers
+- Kafka producers
 - Kafka consumers
+
+### Karate API Tests
+
+Run the Karate BDD API and integration tests:
+
+```bash
+./gradlew karateTest
+```
+
+or on Windows:
+
+```cmd
+gradlew.bat karateTest
+```
+
+These tests validate:
+
+- REST API endpoints
+- Request and response validation
+- End-to-end application behaviour
+- Event-driven order processing workflow
 
 ## Future Enhancements
 
