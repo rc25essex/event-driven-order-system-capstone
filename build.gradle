@@ -18,22 +18,60 @@ repositories {
     mavenCentral()
 }
 
+sourceSets {
+    karateTest {
+        java.srcDirs = ['src/karateTest/java']
+        resources.srcDirs = ['src/karateTest/resources']
+
+        compileClasspath += sourceSets.main.output
+        runtimeClasspath += sourceSets.main.output
+    }
+}
+
+configurations {
+    karateTestImplementation.extendsFrom testImplementation
+    karateTestRuntimeOnly.extendsFrom testRuntimeOnly
+}
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
     implementation 'org.springframework.boot:spring-boot-starter-kafka'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-webmvc'
+
+    runtimeOnly 'com.h2database:h2'
+
     testImplementation 'org.springframework.boot:spring-boot-starter-actuator-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-kafka-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-validation-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-webmvc-test'
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
+
     testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
-    runtimeOnly 'com.h2database:h2'
+
+    karateTestImplementation 'io.karatelabs:karate-junit6:2.0.0'
 }
 
 tasks.named('test') {
     useJUnitPlatform()
+}
+
+tasks.register('karateTest', Test) {
+    description = 'Runs Karate BDD API tests.'
+    group = 'verification'
+
+    testClassesDirs = sourceSets.karateTest.output.classesDirs
+    classpath = sourceSets.karateTest.runtimeClasspath
+
+    useJUnitPlatform()
+    jvmArgs '--enable-preview'
+
+    systemProperties System.properties.findAll { key, value ->
+        key.toString().startsWith('karate.')
+    }
+
+    outputs.upToDateWhen { false }
+    shouldRunAfter tasks.named('test')
 }
