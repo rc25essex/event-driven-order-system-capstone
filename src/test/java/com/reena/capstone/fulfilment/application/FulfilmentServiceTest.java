@@ -6,7 +6,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class FulfilmentServiceTest {
 
-    private final FulfilmentService fulfilmentService = new FulfilmentService();
+    private final FulfilmentService fulfilmentService = new FulfilmentServiceImpl();
 
     @Test
     void shouldFulfilOrderWhenQuantityIsWithinLimit() {

@@ -15,7 +15,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 /**
@@ -35,7 +34,7 @@ class OrderServiceTest {
         orderRepository = mock(OrderRepository.class);
         orderEventPublisher = mock(OrderEventPublisher.class);
 
-        orderService = new OrderService(
+        orderService = new OrderServiceImpl(
                 orderRepository,
                 orderEventPublisher
         );
