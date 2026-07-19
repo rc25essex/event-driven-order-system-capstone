@@ -1,14 +1,17 @@
 package com.reena.capstone.order.api;
 
+import com.reena.capstone.order.api.dto.CreateOrderRequest;
+import com.reena.capstone.order.api.dto.OrderItemRequest;
 import com.reena.capstone.order.application.OrderService;
 import com.reena.capstone.order.domain.Order;
 import com.reena.capstone.order.domain.OrderItem;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import tools.jackson.databind.ObjectMapper;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -16,67 +19,68 @@ import java.util.List;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-/**
- * Unit tests for the OrderController using Spring MVC test support.
- */
 @WebMvcTest(OrderController.class)
 class OrderControllerTest {
 
-    /**
-     * Mock MVC used to simulate HTTP requests.
-     */
+    private static final String CUSTOMER_REFERENCE = "CUSTOMER-1";
+    private static final String PRODUCT_REFERENCE = "PEN";
+    private static final int QUANTITY = 2;
+    private static final BigDecimal UNIT_PRICE = new BigDecimal("10.00");
+
     @Autowired
     private MockMvc mockMvc;
 
-    /**
-     * Mocked service layer to isolate the controller during testing.
-     */
+    @Autowired
+    private ObjectMapper objectMapper;
+
     @MockitoBean
     private OrderService orderService;
 
-    /**
-     * Verifies that a valid order request returns
-     * HTTP 201 Created with the expected response.
-     */
     @Test
     void shouldCreateOrder() throws Exception {
 
-        Order order = new Order(
-                "CUSTOMER-1",
-                List.of(
-                        new OrderItem(
-                                "PEN",
-                                2,
-                                new BigDecimal("10.00")
-                        )
-                )
-        );
+        Order savedOrder = createOrder();
+        CreateOrderRequest request = createOrderRequest();
 
         when(orderService.createOrder(any(Order.class)))
-                .thenReturn(order);
-
-        String request = """
-                {
-                  "customerReference": "CUSTOMER-1",
-                  "items": [
-                    {
-                      "productReference": "PEN",
-                      "quantity": 2,
-                      "unitPrice": 10.00
-                    }
-                  ]
-                }
-                """;
+                .thenReturn(savedOrder);
 
         mockMvc.perform(post("/api/orders")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content(request))
+                        .content(objectMapper.writeValueAsString(request)))
                 .andExpect(status().isCreated())
                 .andExpect(jsonPath("$.customerReference")
-                        .value("CUSTOMER-1"))
+                        .value(CUSTOMER_REFERENCE))
                 .andExpect(jsonPath("$.status")
                         .value("PENDING"));
+    }
+
+    private Order createOrder() {
+        return new Order(
+                CUSTOMER_REFERENCE,
+                List.of(
+                        new OrderItem(
+                                PRODUCT_REFERENCE,
+                                QUANTITY,
+                                UNIT_PRICE
+                        )
+                )
+        );
+    }
+
+    private CreateOrderRequest createOrderRequest() {
+        return new CreateOrderRequest(
+                CUSTOMER_REFERENCE,
+                List.of(
+                        new OrderItemRequest(
+                                PRODUCT_REFERENCE,
+                                QUANTITY,
+                                UNIT_PRICE
+                        )
+                )
+        );
     }
 }
