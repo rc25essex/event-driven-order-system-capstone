@@ -1,6 +1,5 @@
 package com.reena.capstone.order.api;
 
-import tools.jackson.databind.ObjectMapper;
 import com.reena.capstone.order.application.OrderService;
 import com.reena.capstone.order.domain.Order;
 import com.reena.capstone.order.domain.OrderItem;
@@ -19,18 +18,28 @@ import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
+/**
+ * Unit tests for the OrderController using Spring MVC test support.
+ */
 @WebMvcTest(OrderController.class)
 class OrderControllerTest {
 
+    /**
+     * Mock MVC used to simulate HTTP requests.
+     */
     @Autowired
     private MockMvc mockMvc;
 
-    @Autowired
-    private ObjectMapper objectMapper;
-
+    /**
+     * Mocked service layer to isolate the controller during testing.
+     */
     @MockitoBean
     private OrderService orderService;
 
+    /**
+     * Verifies that a valid order request returns
+     * HTTP 201 Created with the expected response.
+     */
     @Test
     void shouldCreateOrder() throws Exception {
 

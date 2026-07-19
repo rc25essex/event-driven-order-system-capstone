@@ -14,16 +14,28 @@ import java.net.URI;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * REST controller responsible for handling order-related API requests.
+ */
 @RestController
 @RequestMapping("/api/orders")
 public class OrderController {
 
     private final OrderService orderService;
 
+    /**
+     * Constructor injection of the OrderService.
+     */
     public OrderController(OrderService orderService) {
         this.orderService = orderService;
     }
 
+    /**
+     * Creates a new customer order.
+     * Validates the request, converts DTOs into domain objects,
+     * delegates processing to the service layer and returns
+     * HTTP 201 Created with the order details.
+     */
     @PostMapping
     public ResponseEntity<OrderResponse> createOrder(
             @Valid @RequestBody CreateOrderRequest request
@@ -42,6 +54,7 @@ public class OrderController {
                 items
         );
 
+        // Delegate order creation to the service layer
         Order savedOrder = orderService.createOrder(order);
 
         return ResponseEntity
@@ -49,11 +62,17 @@ public class OrderController {
                 .body(toResponse(savedOrder));
     }
 
+    /**
+     * Retrieves a single order by its unique identifier.
+     */
     @GetMapping("/{orderId}")
     public OrderResponse getOrder(@PathVariable UUID orderId) {
         return toResponse(orderService.getOrder(orderId));
     }
 
+    /**
+     * Retrieves all customer orders.
+     */
     @GetMapping
     public List<OrderResponse> getAllOrders() {
         return orderService.getAllOrders()
@@ -62,6 +81,9 @@ public class OrderController {
                 .toList();
     }
 
+    /**
+     * Converts a domain Order object into an API response DTO.
+     */
     private OrderResponse toResponse(Order order) {
         List<OrderItemRequest> items = order.getItems()
                 .stream()
@@ -72,6 +94,7 @@ public class OrderController {
                 ))
                 .toList();
 
+        // Build and return the response object
         return new OrderResponse(
                 order.getId(),
                 order.getCustomerReference(),
