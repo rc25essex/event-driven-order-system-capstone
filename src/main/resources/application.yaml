@@ -31,4 +31,4 @@ spring:
       value-deserializer: org.springframework.kafka.support.serializer.JacksonJsonDeserializer
 
       properties:
-        spring.json.trusted.packages: "com.reena.capstone.*"
+        spring.json.trusted.packages: "com.ordersystem.capstone.*"
